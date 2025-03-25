@@ -2,3 +2,6 @@ have to rework how client to server and server to client works
 replicated storage is made to somehow receive and share the events/functions between client & server and the other way round
 
 not really sure how it works myself but know that i need to redo it
+
+❗also something to note, nothing will be shown here, because all of the Events/Modules can only be created in game
+and then referenced here, they dont have any code they are just used to make client and server communicate and vice versa ❗

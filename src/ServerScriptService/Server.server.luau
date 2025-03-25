@@ -177,6 +177,7 @@ coinValue.OnServerEvent:Connect(function(player, can_touch_cl)
 	end
 end)
 
+-- what happens after a coin is collected
 coinLoop.OnServerEvent:Connect(function(player, can_be_touched)
 	for parent, blocks_table in pairs(cached_coins) do
 		for _, blocks in pairs(blocks_table) do

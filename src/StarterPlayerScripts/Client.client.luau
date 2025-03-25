@@ -17,6 +17,9 @@ local debounceToClient = replicated_storage:FindFirstChild("DebounceToClient")
 -- then bugs can also be worked out because now how the information is being passed
 -- is very random and mostly confusing
 
+-- the reason they are not in the ReplicatedStorage folder is because they can only be created in game. but they have no code inside them
+-- hope it makes sense
+
 local stages = {
 	["Stage1"] = {
 		["Points"] = 2, -- points to complete
