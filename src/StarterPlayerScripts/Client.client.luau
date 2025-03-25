@@ -18,6 +18,7 @@ local debounceToClient = replicated_storage:FindFirstChild("DebounceToClient")
 -- is very random and mostly confusing
 
 -- the reason they are not in the ReplicatedStorage folder is because they can only be created in game. but they have no code inside them
+-- their main purpose is to let client/server, server/client communicate with each other
 -- hope it makes sense
 
 local stages = {
