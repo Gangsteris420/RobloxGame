@@ -46,7 +46,7 @@ local debounce_coins = {}
 -- 1. a dictionary received from server is being looped over
 -- 2. requires some nested looping to acquire the model(s)
 -- 3. once the model(s) are acquired then they are being looped over
--- 4. model is being looped over and parts are being received, then a String part from the dictionary is being checked with String part from the model
+-- 4. model is being looped over and parts are being received, then a String part name from the dictionary is being checked with String part name from the model's part
 -- 5. if they are equal, the actual part/model (its instance) can be found.
 
 -- Honestly, I would just send an instance from server to client but it either doesn't work ir isn't that simple overall
