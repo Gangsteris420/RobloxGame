@@ -281,7 +281,7 @@ game.Players.PlayerAdded:Connect(function(player)
 			for parent, health in pairs(stage_sv[player_userId]) do -- parent needed
 
 				if health == 3 then
-					print("tuff shit")
+					print("tuff")
 					print(parent)
 					playerRespawns[player_userId][parent] = nil
 					debounce_platforms[player_userId][parent] = nil
