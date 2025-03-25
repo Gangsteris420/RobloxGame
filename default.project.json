@@ -1,0 +1,28 @@
+{
+  "name": "RobloxGame",
+  "tree": {
+    "$className": "DataModel",
+    "$ignoreUnknownInstances": true,
+
+    "ReplicatedStorage": {
+      "$ignoreUnknownInstances": true,
+      "$className" : "ReplicatedStorage",
+      "$path": "src/ReplicatedStorage"
+    },
+
+    "ServerScriptService": {
+      "$ignoreUnknownInstances": true,
+      "$className" : "ServerScriptService",
+      "$path": "src/ServerScriptService"
+    },
+
+    "StarterPlayer": {
+      "$ignoreUnknownInstances": true,
+      "$className" : "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className" : "StarterPlayerScripts",
+        "$path": "src/StarterPlayerScripts"
+      }
+    }
+  }
+}

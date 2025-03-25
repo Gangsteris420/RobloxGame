@@ -1,0 +1,4 @@
+have to rework how client to server and server to client works
+replicated storage is made to somehow receive and share the events/functions between client & server and the other way round
+
+not really sure how it works myself but know that i need to redo it
