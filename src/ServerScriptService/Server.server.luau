@@ -107,12 +107,7 @@ for parent,block in pairs(cached_buttons) do
 				debounce_buttons[player_userId][block.Parent.Name] = block.Name
 
 				task.wait(0.1)
-				buttonTouched:FireClient(player, otherPart, block.Parent:FindFirstChild(platform_door), debounce_buttons) 
-
-				-- probably also need to send debounce_platforms to the client because from 
-				-- ButtonTouched() function other functions will be called too because those functions will be called
-				-- from a client function which was called from a server function so it will only work on one player
-				-- but probably need to send debounce_platforms for reset handling
+				buttonTouched:FireClient(player, otherPart, block.Parent:FindFirstChild(platform_door), debounce_buttons)
 			end
 		end
 	end)
