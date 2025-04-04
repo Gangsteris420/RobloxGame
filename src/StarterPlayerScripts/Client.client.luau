@@ -65,8 +65,8 @@ local debounce_coins = {}
 	end
 end)--]]
 
+-- gets called from the server once interacted with red button
 buttonEvent.OnClientEvent:Connect(function(otherPart, platform, debounce_buttons_sv)
-	print("was it even received??")
 	debounce_buttons = debounce_buttons_sv
 	ButtonTouched(otherPart, platform)
 end)
@@ -75,8 +75,6 @@ function ButtonTouched(otherPart, platform)
 	local humanoid = otherPart.Parent:FindFirstChild("Humanoid")
 	local player = game.Players:GetPlayerFromCharacter(otherPart.Parent)
 	local player_userId = tostring(player.UserId)
-
-	--coinLoop:FireServer()
 
 	if can_be_touched[player.UserId] == nil then
 		can_be_touched[player.UserId] = true

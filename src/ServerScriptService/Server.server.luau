@@ -172,42 +172,38 @@ coinValue.OnServerEvent:Connect(function(player, can_touch_cl)
 	end
 end)
 
--- what happens after a coin is collected
 coinLoop.OnServerEvent:Connect(function(player, can_be_touched)
-	for parent, blocks_table in pairs(cached_coins) do
+	for _, blocks_table in pairs(cached_coins) do
 		for _, blocks in pairs(blocks_table) do
-
-			blocks.Touched:Connect(function(otherPart)
-				local humanoid = otherPart.Parent:FindFirstChild("Humanoid")
-				local player = game.Players:GetPlayerFromCharacter(otherPart.Parent)
-				local player_userId = tostring(player.UserId)
-
-				if player and humanoid and can_be_touched[player_userId] ~= nil then
-
-					--if not debounce_coins[player_userId] then -- ai
-					print(debounce_coins)
-
-					-- idk if its the proper way but so far works
-					if debounce_coins[player_userId] ~= nil and debounce_coins[player_userId][blocks.Name] ~= nil then
-						debounce_coins[player_userId][blocks.Name] = nil
-					end
-
-					if not debounce_coins[player_userId] then
-						debounce_coins[player_userId] = {}
-					end
-
-					if not debounce_coins[player_userId][blocks.Name] then -- ai
-						debounce_coins[player_userId][blocks.Name] = blocks.Parent.Name
-
-						debounceToClient:FireClient(player, debounce_coins)
-						blocks.Transparency = 1
-					end
-				end
-			end)
+			CoinCollected(player, can_be_touched, blocks)
 		end
 	end
-
 end)
+
+function CoinCollected(player, can_be_touched, blocks)
+	blocks.Touched:Connect(function(otherPart)
+		local humanoid = otherPart.Parent:FindFirstChild("Humanoid")
+		local player_userId = tostring(player.UserId)
+
+		if player and humanoid and can_be_touched[player_userId] ~= nil then
+
+			if debounce_coins[player_userId] ~= nil and debounce_coins[player_userId][blocks.Name] ~= nil then
+				debounce_coins[player_userId][blocks.Name] = nil
+			end
+
+			if not debounce_coins[player_userId] then
+				debounce_coins[player_userId] = {}
+			end
+
+			if not debounce_coins[player_userId][blocks.Name] then -- ai
+				debounce_coins[player_userId][blocks.Name] = blocks.Parent.Name
+
+				debounceToClient:FireClient(player, debounce_coins)
+				blocks.Transparency = 1
+			end
+		end
+	end)
+end
 
 debounceToServer.onServerEvent:Connect(function(received_dbc)
 	debounce_coins = received_dbc
@@ -265,7 +261,7 @@ game.Players.PlayerAdded:Connect(function(player)
 				last_stage += 1
 			end
 
-			-- code to get the last stage and then do something with it.
+			-- code to get the last saved stage and then do something with it.
 			local i = 0
 			for parent, value in pairs(stage_sv[player_userId]) do -- parent needed
 				i = i + 1
