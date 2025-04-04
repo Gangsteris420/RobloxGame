@@ -77,19 +77,21 @@ function ButtonTouched(otherPart, platform)
 	local player_userId = tostring(player.UserId)
 
 	if can_be_touched[player.UserId] == nil then
-		can_be_touched[player.UserId] = true
 
+		can_be_touched[player.UserId] = true
 		coinLoop:FireServer(can_be_touched)
 
 		platform.Transparency = 1
 		platform.CanCollide = false
 
-		local stages_ = stages[platform.Parent.name]["Time"]
-		for i = 1, stages_, 1 do
+		local stage_time = stages[platform.Parent.name]["Time"]
+		for i = 1, stage_time, 1 do
 			task.wait(1)
 			print(i)
 
-			if i == stages_ or humanoid.Health == 0 or debounce_platforms[player_userId] ~= nil and debounce_platforms[player_userId][platform.Parent.name] ~= nil then
+			-- platform ending conditions
+			if i == stage_time or humanoid.Health == 0 or debounce_platforms[player_userId] ~= nil and debounce_platforms[player_userId][platform.Parent.name] ~= nil then
+
 				can_be_touched[player.UserId] = nil
 				coinValue:FireServer(can_be_touched)
 

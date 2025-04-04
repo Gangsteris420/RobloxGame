@@ -162,9 +162,10 @@ end
 local can_be_touched = {}
 local debounce_coins = {}
 
-coinValue.OnServerEvent:Connect(function(player, can_touch_cl)
+coinValue.OnServerEvent:Connect(function(_, can_touch_cl)
 	can_be_touched = can_touch_cl
 
+	-- collected coin blocks are reset after platform timer is finished
 	for _, blocks_table in pairs(cached_coins) do
 		for _, blocks in pairs(blocks_table) do
 			blocks.Transparency = 0
@@ -172,15 +173,17 @@ coinValue.OnServerEvent:Connect(function(player, can_touch_cl)
 	end
 end)
 
+-- receives can_be_touched boolean from client, then sends the boolean to the function
+-- and other required variables for block interaction
 coinLoop.OnServerEvent:Connect(function(player, can_be_touched)
 	for _, blocks_table in pairs(cached_coins) do
 		for _, blocks in pairs(blocks_table) do
-			CoinCollected(player, can_be_touched, blocks)
+			coinTouched(player, can_be_touched, blocks)
 		end
 	end
 end)
 
-function CoinCollected(player, can_be_touched, blocks)
+function coinTouched(player, can_be_touched, blocks)
 	blocks.Touched:Connect(function(otherPart)
 		local humanoid = otherPart.Parent:FindFirstChild("Humanoid")
 		local player_userId = tostring(player.UserId)
