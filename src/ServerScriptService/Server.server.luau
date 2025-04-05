@@ -92,6 +92,8 @@ for _, block in pairs(cached_buttons) do
 
 				task.wait(0.1)
 
+				-- need to figure a better way of sending information to client and then figuring it to which stage it belongs to
+				
 				local cloned_part = otherPart:Clone()
 				local cloned_block = block:Clone()
 
