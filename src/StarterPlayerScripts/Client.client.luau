@@ -69,9 +69,14 @@ characterJoined.OnClientEvent:Connect(function(coins)
 	end
 end)
 
+-- here is what is being received from the server once a button is touched in server
+-- probably a better way of doing this is sending a player rather than instance of touchedPart
+-- as well as sending the clonedBlock.Name and clonedBlock.Parent.Name and this way finding and instance
+-- or something similarly
+
 buttonTouched.OnClientEvent:Connect(function(clonedPart, clonedBlock, button_touched)
 
-	for key, value in ipairs(game.Players.LocalPlayer.ClonedInstances:GetChildren()) do
+	for _, stage in ipairs(game.Players.LocalPlayer.ClonedInstances:GetChildren()) do
 		--clonedPart.Parent = 
 		--clonedBlock.Parent = 
 		print(key, value)
