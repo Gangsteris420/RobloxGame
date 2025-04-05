@@ -79,7 +79,7 @@ buttonTouched.OnClientEvent:Connect(function(clonedPart, clonedBlock, button_tou
 	for _, stage in ipairs(game.Players.LocalPlayer.ClonedInstances:GetChildren()) do
 		--clonedPart.Parent = 
 		--clonedBlock.Parent = 
-		print(stage) -- _ is index so its unnecesary
+		print(stage) -- _ is index so its unnecesaryyy
 	end
 	
 	--ButtonTouched(clonedPart, clonedBlock, button_touched)
