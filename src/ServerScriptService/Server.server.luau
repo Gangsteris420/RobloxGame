@@ -125,7 +125,7 @@ game.Players.PlayerAdded:Connect(function(player)
 	ClonedInstances.Name = "ClonedInstances"
 	ClonedInstances.Parent = player
 
-	player.CharacterAdded:Connect(function(character) 
+	--[[player.CharacterAdded:Connect(function(character) 
 		--local rootPart = character:WaitForChild("HumanoidRootPart", 5)
 		local cloning = {}
 
@@ -135,8 +135,8 @@ game.Players.PlayerAdded:Connect(function(player)
 				clone.Parent = game.ReplicatedStorage
 				table.insert(cloning, clone)
 			end
-		end
+		end--]]
 
-		sendCache:FireClient(player, cloning --[[cached_coins--]])
-	end)
+		--sendCache:FireClient(player, cloning --[[cached_coins--]])
+	--end)
 end)

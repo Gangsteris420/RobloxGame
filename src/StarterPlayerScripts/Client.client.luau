@@ -53,7 +53,7 @@ end)--]]
 local duplicated_stages = {}
 local can_be_touched = nil
 
-characterJoined.OnClientEvent:Connect(function(coins)
+--[[characterJoined.OnClientEvent:Connect(function(coins)
 	task.wait(1)
 
 	local InstancedStages = {}
@@ -63,7 +63,7 @@ characterJoined.OnClientEvent:Connect(function(coins)
 			stage.Parent = game.Players.LocalPlayer.ClonedInstances
 		end
 	end
-end)
+end)--]]
 
 -- here is what is being received from the server once a button is touched in server
 -- probably a better way of doing this is sending a player rather than instance of touchedPart
@@ -79,7 +79,7 @@ function ButtonTouched(button_touched)
 
 	for _, inner_table in pairs(button_touched) do
 		for stage_string, _ in pairs(inner_table) do
-			for _, stage_instance in ipairs(game.Players.LocalPlayer.ClonedInstances:GetChildren()) do
+			for _, stage_instance in ipairs(game.Workspace.Obby:GetChildren()) do
 
 				if stage_instance.Name == stage_string then
 					platform = stage_instance:FindFirstChild("BigPlatformDoorOne")
@@ -88,9 +88,12 @@ function ButtonTouched(button_touched)
 		end
 	end
 
+	print("triggered")
+
 	-- does not work, need to re-evaluate whether cloning each stage into a certain player is smart or does it even work
 	platform.Transparency = 1
-	print(platform.Transparency)
+	task.wait(3)
+	platform.Transparency = 0
 
 	local player = game.Players.LocalPlayer
 	local humanoid = player.Character:WaitForChild("Humanoid")
