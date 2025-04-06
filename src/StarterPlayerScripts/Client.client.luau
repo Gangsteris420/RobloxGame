@@ -88,12 +88,7 @@ function ButtonTouched(button_touched)
 		end
 	end
 
-	print("triggered")
-
-	-- does not work, need to re-evaluate whether cloning each stage into a certain player is smart or does it even work
-	platform.Transparency = 1
-	task.wait(3)
-	platform.Transparency = 0
+	-- does work, logic was re-evaluated
 
 	local player = game.Players.LocalPlayer
 	local humanoid = player.Character:WaitForChild("Humanoid")
