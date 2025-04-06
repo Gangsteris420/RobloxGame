@@ -88,7 +88,7 @@ function ButtonTouched(button_touched)
 		end
 	end
 
-	-- does not work, need to revaluate whether cloning each stage into a certain player is smart or does it even work
+	-- does not work, need to re-evaluate whether cloning each stage into a certain player is smart or does it even work
 	platform.Transparency = 1
 	print(platform.Transparency)
 
