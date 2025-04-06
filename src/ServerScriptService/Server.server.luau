@@ -93,9 +93,12 @@ for _, block in pairs(cached_buttons) do
 
 				task.wait(0.1)
 
-				-- need to figure a better way of sending information to client and then figuring it to which stage it belongs to
-
-				buttonTouched:FireClient(player, button_touched) -- block.Parent:FindFirstChild(platform_door)
+				-- logic was re-evaluated in the server, button_touched only has strings, first table is with the 
+				-- sole string name of the player_userId, the inner table has stage to which the button pressed belongs
+				-- and the value of true. This table with inner table is sent to client, client loops through
+				-- gets the data and then gets the actual instances from the name by looping through shared game.Workspace.Obby
+				
+				buttonTouched:FireClient(player, button_touched) 
 			end
 		end
 	end)
