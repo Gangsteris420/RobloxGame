@@ -79,20 +79,23 @@ buttonTouched.OnClientEvent:Connect(function(button_touched)
 end)
 
 function ButtonTouched(button_touched)
-	--[[local player_userId = nil
+	local platform = nil
 
-	for user_id, inner_table in pairs(button_touched) do
-		player_userId = tonumber(user_id)
-
+	for _, inner_table in pairs(button_touched) do
 		for stage_string, _ in pairs(inner_table) do
-			
+			for _, stage_instance in ipairs(game.Players.LocalPlayer.ClonedInstances:GetChildren()) do
+
+				if stage_instance.Name == stage_string then
+					platform = stage_instance:FindFirstChild("BigPlatformDoorOne")
+				end
+			end
 		end
 	end
 
-	local player = game.Players:GetPlayerByUserId(player_userId)
-	local humanoid = player.Character:WaitForChild("Humanoid")--]]
+	print("platform", platform)
 
-	print("player", game.Players.LocalPlayer)
+	local player = game.Players.LocalPlayer
+	local humanoid = player.Character:WaitForChild("Humanoid")
 
 	--[[local stage_time = stages[platform.Parent.name]["Time"]
 
