@@ -88,19 +88,14 @@ for _, block in pairs(cached_buttons) do
 
 			if not button_touched[player_userId][block.Parent.Name] then
 				button_touched[player_userId][block.Parent.Name] = true
-				print(button_touched)
+
+				print(button_touched, "button")
 
 				task.wait(0.1)
 
 				-- need to figure a better way of sending information to client and then figuring it to which stage it belongs to
-				
-				local cloned_part = otherPart:Clone()
-				local cloned_block = block:Clone()
 
-				cloned_part.Parent = game.ReplicatedStorage
-				cloned_block.Parent = game.ReplicatedStorage
-
-				buttonTouched:FireClient(player, cloned_part, cloned_block, button_touched) -- block.Parent:FindFirstChild(platform_door)
+				buttonTouched:FireClient(player, button_touched) -- block.Parent:FindFirstChild(platform_door)
 			end
 		end
 	end)

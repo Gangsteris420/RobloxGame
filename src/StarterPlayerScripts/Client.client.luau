@@ -74,21 +74,27 @@ end)
 -- as well as sending the clonedBlock.Name and clonedBlock.Parent.Name and this way finding and instance
 -- or something similarly
 
-buttonTouched.OnClientEvent:Connect(function(clonedPart, clonedBlock, button_touched)
-
-	for _, stage in ipairs(game.Players.LocalPlayer.ClonedInstances:GetChildren()) do
-		--clonedPart.Parent = 
-		--clonedBlock.Parent = 
-		print(stage) -- _ is index so its unnecesaryyy
-	end
-	
-	--ButtonTouched(clonedPart, clonedBlock, button_touched)
+buttonTouched.OnClientEvent:Connect(function(button_touched)
+	ButtonTouched(button_touched)
 end)
 
-function ButtonTouched(otherPart, clonedBlock, button_touched)
-	local humanoid = otherPart.Parent:FindFirstChild("Humanoid")
-	local player = game.Players:GetPlayerFromCharacter(otherPart.Parent)
-	local stage_time = stages[platform.Parent.name]["Time"]
+function ButtonTouched(button_touched)
+	--[[local player_userId = nil
+
+	for user_id, inner_table in pairs(button_touched) do
+		player_userId = tonumber(user_id)
+
+		for stage_string, _ in pairs(inner_table) do
+			
+		end
+	end
+
+	local player = game.Players:GetPlayerByUserId(player_userId)
+	local humanoid = player.Character:WaitForChild("Humanoid")--]]
+
+	print("player", game.Players.LocalPlayer)
+
+	--[[local stage_time = stages[platform.Parent.name]["Time"]
 
 	if can_be_touched == nil and player then
 		can_be_touched = true
@@ -115,7 +121,7 @@ function ButtonTouched(otherPart, clonedBlock, button_touched)
 				break
 			end
 		end
-	end
+	end--]]
 end
 
 for _, blocks in pairs(cached_coins) do
