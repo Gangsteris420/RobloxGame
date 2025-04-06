@@ -24,10 +24,6 @@ local stages = {
 	},
 }
 
-
-local debounce_platforms = {}
-local debounce_buttons = {}
-
 local touched_coins = {}
 local cached_coins = {}
 
@@ -92,7 +88,9 @@ function ButtonTouched(button_touched)
 		end
 	end
 
-	print("platform", platform)
+	-- does not work, need to revaluate whether cloning each stage into a certain player is smart or does it even work
+	platform.Transparency = 1
+	print(platform.Transparency)
 
 	local player = game.Players.LocalPlayer
 	local humanoid = player.Character:WaitForChild("Humanoid")
@@ -118,7 +116,7 @@ function ButtonTouched(button_touched)
 				platform.CanCollide = true
 
 				for key, value in pairs(duplicated_stages) do
-					print(key, value)
+					print(key, value, "duplicatedStages")
 				end
 
 				break
