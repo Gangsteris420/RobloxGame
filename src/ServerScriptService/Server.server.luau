@@ -82,9 +82,15 @@ for _, block in pairs(cached_buttons) do
 			local player = game.Players:GetPlayerFromCharacter(otherPart.Parent) -- get player from touching part
 			local player_userId = tostring(player.UserId)
 
-			if not button_touched[player_userId] then
+			if not button_touched[player_userId] then 
 				button_touched[player_userId] = {}
 			end
+
+			-- table that has all the strings for finding a shared instance in client/server
+			-- [[ ["491595967"] =  ▼  {
+				-- ["Stage1"] = true
+			 --]] } 
+			-- table example
 
 			if not button_touched[player_userId][block.Parent.Name] then
 				button_touched[player_userId][block.Parent.Name] = true
@@ -99,6 +105,23 @@ for _, block in pairs(cached_buttons) do
 				-- gets the data and then gets the actual instances from the name by looping through shared game.Workspace.Obby
 				
 				buttonTouched:FireClient(player, button_touched) 
+			end
+		end
+	end)
+end
+
+-- Coin Collected/Touched
+for _, blocks in pairs(cached_coins) do
+	blocks.Touched:Connect(function(otherPart)
+		local humanoid = otherPart.Parent:FindFirstChild("Humanoid")
+		local player = game.Players:GetPlayerFromCharacter(otherPart.Parent)
+
+		if player and humanoid and can_be_touched ~= nil then
+
+			if not touched_coins[blocks.Name] then -- ai
+				touched_coins[blocks.Name] = blocks.Parent.Name
+
+				blocks.Transparency = 1
 			end
 		end
 	end)
@@ -123,10 +146,6 @@ game.Players.PlayerAdded:Connect(function(player)
 	stage.Name = "Stage_Health"
 	stage.Value = 0
 	stage.Parent = PlayerStats
-
-	local ClonedInstances = Instance.new("Folder")
-	ClonedInstances.Name = "ClonedInstances"
-	ClonedInstances.Parent = player
 
 	--[[player.CharacterAdded:Connect(function(character) 
 		--local rootPart = character:WaitForChild("HumanoidRootPart", 5)
