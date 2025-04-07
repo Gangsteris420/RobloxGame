@@ -1,6 +1,7 @@
 local ReplicatedStorage = game.ReplicatedStorage
 local characterJoined = ReplicatedStorage:FindFirstChild("SendCache")
 local buttonTouched = ReplicatedStorage:FindFirstChild("ButtonTouched")
+local remoteFunction = ReplicatedStorage:FindFirstChild("RemoteFunction")
 
 -- need to rework this part completely (how information is being passed to each client and server and from each other)
 -- then bugs can also be worked out because now how the information is being passed
@@ -73,6 +74,7 @@ end)--]]
 buttonTouched.OnClientEvent:Connect(function(button_touched)
 	local platform = nil
 
+	-- this should become a function at one point
 	for _, inner_table in pairs(button_touched) do
 		for stage_string, _ in pairs(inner_table) do
 			for _, stage_instance in ipairs(game.Workspace.Obby:GetChildren()) do
@@ -93,6 +95,9 @@ buttonTouched.OnClientEvent:Connect(function(button_touched)
 
 	if can_be_touched == nil and player then
 		can_be_touched = true
+
+		-- InvokeServer() here
+		remoteFunction:InvokeServer(can_be_touched)
 
 		platform.Transparency = 1
 		platform.CanCollide = false
