@@ -1,0 +1,4 @@
+https://devforum.roblox.com/t/how-do-i-get-a-players-userid/1176992/2
+https://devforum.roblox.com/t/get-humanoid-from-player/1514825/6
+
+also player in client is always local, game.Players.LocalPlayer so no need to send from server to client actual player
