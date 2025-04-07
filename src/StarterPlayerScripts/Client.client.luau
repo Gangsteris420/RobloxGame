@@ -71,10 +71,6 @@ end)--]]
 -- or something similarly
 
 buttonTouched.OnClientEvent:Connect(function(button_touched)
-	ButtonTouched(button_touched)
-end)
-
-function ButtonTouched(button_touched)
 	local platform = nil
 
 	for _, inner_table in pairs(button_touched) do
@@ -89,11 +85,11 @@ function ButtonTouched(button_touched)
 	end
 
 	-- does work, logic was re-evaluated
+	-- continue working on from line 98
 
 	local player = game.Players.LocalPlayer
 	local humanoid = player.Character:WaitForChild("Humanoid")
-
-	--[[local stage_time = stages[platform.Parent.name]["Time"]
+	local stage_time = stages[platform.Parent.name]["Time"]
 
 	if can_be_touched == nil and player then
 		can_be_touched = true
@@ -113,28 +109,11 @@ function ButtonTouched(button_touched)
 				platform.Transparency = 0
 				platform.CanCollide = true
 
-				for key, value in pairs(duplicated_stages) do
-					print(key, value, "duplicatedStages")
-				end
+				-- need to implement logic for reseting transparancy of collected coins 
 
 				break
 			end
 		end
-	end--]]
-end
+	end
+end)
 
-for _, blocks in pairs(cached_coins) do
-	blocks.Touched:Connect(function(otherPart)
-		local humanoid = otherPart.Parent:FindFirstChild("Humanoid")
-		local player = game.Players:GetPlayerFromCharacter(otherPart.Parent)
-
-		if player and humanoid and can_be_touched ~= nil then
-
-			if not touched_coins[blocks.Name] then -- ai
-				touched_coins[blocks.Name] = blocks.Parent.Name
-
-				blocks.Transparency = 1
-			end
-		end
-	end)
-end
