@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local sendCache = ReplicatedStorage:FindFirstChild("SendCache")
 local buttonTouched = ReplicatedStorage:FindFirstChild("ButtonTouched")
+local remoteFunction = ReplicatedStorage:FindFirstChild("RemoteFunction")
 
 local platform_name = "BigPlatformFinish"
 local platform_door = "BigPlatformDoorOne"
@@ -111,20 +112,34 @@ for _, block in pairs(cached_buttons) do
 end
 
 -- Coin Collected/Touched
-for _, blocks in pairs(cached_coins) do
-	blocks.Touched:Connect(function(otherPart)
-		local humanoid = otherPart.Parent:FindFirstChild("Humanoid")
-		local player = game.Players:GetPlayerFromCharacter(otherPart.Parent)
+for _, inner_table in pairs(cached_coins) do
+	for _, coins in ipairs(inner_table) do
 
-		if player and humanoid and can_be_touched ~= nil then
+		coins.Touched:Connect(function(otherPart)
+			local humanoid = otherPart.Parent:FindFirstChild("Humanoid")
+			local player = game.Players:GetPlayerFromCharacter(otherPart.Parent)
+			local can_be_touched = ServerInvoked()
 
-			if not touched_coins[blocks.Name] then -- ai
-				touched_coins[blocks.Name] = blocks.Parent.Name
+			print(can_be_touched, "coin collected")
 
-				blocks.Transparency = 1
-			end
-		end
-	end)
+			--[[if player and humanoid and can_be_touched ~= nil then
+
+				if not touched_coins[blocks.Name] then -- ai
+					touched_coins[blocks.Name] = blocks.Parent.Name
+
+					blocks.Transparency = 1
+				end
+			end--]]
+		end)
+	end
+end
+
+function ServerInvoked()
+	local boolean = nil
+	remoteFunction.OnServerInvoke = function(player, can_be_touched)
+		boolean = can_be_touched
+	end
+	return boolean
 end
 
 game.Players.PlayerAdded:Connect(function(player)
