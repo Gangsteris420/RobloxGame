@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local sendCache = ReplicatedStorage:FindFirstChild("SendCache")
 local buttonTouched = ReplicatedStorage:FindFirstChild("ButtonTouched")
 local remoteFunction = ReplicatedStorage:FindFirstChild("RemoteFunction")
+local remoteEvent = ReplicatedStorage:FindFirstChild("RemoteEvent")
 
 local platform_name = "BigPlatformFinish"
 local platform_door = "BigPlatformDoorOne"
@@ -134,9 +135,10 @@ for _, inner_table in pairs(cached_coins) do
 	end
 end
 
+-- might need this example in future for reference
 function ServerInvoked()
 	local boolean = nil
-	remoteFunction.OnServerInvoke = function(player, can_be_touched)
+	remoteFunction.OnServerInvoke = function(_, can_be_touched)
 		boolean = can_be_touched
 	end
 	return boolean
