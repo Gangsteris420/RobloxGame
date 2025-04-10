@@ -2,6 +2,7 @@ local ReplicatedStorage = game.ReplicatedStorage
 local characterJoined = ReplicatedStorage:FindFirstChild("SendCache")
 local buttonTouched = ReplicatedStorage:FindFirstChild("ButtonTouched")
 local remoteFunction = ReplicatedStorage:FindFirstChild("RemoteFunction")
+local remoteEvent = ReplicatedStorage:FindFirstChild("RemoteEvent")
 
 -- need to rework this part completely (how information is being passed to each client and server and from each other)
 -- then bugs can also be worked out because now how the information is being passed
@@ -98,6 +99,7 @@ buttonTouched.OnClientEvent:Connect(function(button_touched)
 
 		-- InvokeServer() here
 		remoteFunction:InvokeServer(can_be_touched)
+		--remoteEvent:FireServer(can_be_touched)
 
 		platform.Transparency = 1
 		platform.CanCollide = false
