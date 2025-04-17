@@ -4,20 +4,18 @@ local buttonTouched = ReplicatedStorage:FindFirstChild("ButtonTouched")
 local remoteFunction = ReplicatedStorage:FindFirstChild("RemoteFunction")
 local remoteEvent = ReplicatedStorage:FindFirstChild("RemoteEvent")
 
-local platform_name = "BigPlatformFinish"
-local platform_door = "BigPlatformDoorOne"
-local button_name = "RedButtonOne"
-local coin_block_names = { "CoinBlock1", "CoinBlock2"}
+local platform_name = "BigPlatformFinish"  -- could use a module script for this in the future
+local platform_door = "BigPlatformDoorOne"  -- could use a module script for this in the future
+local button_name = "RedButtonOne" -- could use a module script for this in the future
+local coin_block_names = { "CoinBlock1", "CoinBlock2"}  -- could use a module script for this in the future
 
 --local killPart = game.ReplicatedStorage.Obby:FindFirstChild("KillPart")
 
-local cached_coins = {}
-local cached_buttons = {}
-local cached_platforms = {}
+--local cached_coins = {}
+--local cached_buttons = {}
+--local cached_platforms = {}
 
-local debounce_platforms = {}
-
-local stages = {
+local stages = { -- could use a module script for this in the future
 	["Stage1"] = {
 		["Points"] = 2,
 		["Time"] = 10, -- seconds
@@ -35,45 +33,49 @@ local stages = {
 -- need to add that check so loop waited for the models to load, or maybe it doesnt detect the Obby folder itself WITH the models
 -- need to investigate more.
 
-for _, model in ipairs(game.Workspace.Obby:GetChildren()) do -- looping through models in folder
-	for _, part in ipairs(model:GetChildren()) do -- looping through parts of a model
+local cached_buttons = {
+	Buttons = {},
+	Platforms = {},
+	Coins = {}
+}
 
-		-- cache buttons for each stage
-		-- need fix this
-		if part.Name == button_name then
-			if not cached_buttons[part.Parent] then
-				cached_buttons[part.Parent] = part
-			end
-		end
-
-		-- cache platform finish points 
-		-- need fix this
-		if part.name == platform_name then
-			if not cached_platforms[part.Parent] then
-				cached_platforms[part.Parent] = part -- part.Parent part
-			end
-		end
-
-		-- cache coins for stages
-
-		for i = 1, #coin_block_names do
-			if part.Name == coin_block_names[i] then
-				if not cached_coins[part.Parent] then -- might need to use part.Parent.Name
-					cached_coins[part.Parent] = {}
+for caching_tables, table_value in pairs(cached_buttons) do
+	setmetatable(cached_buttons[caching_tables], {
+		__newindex = function(self, key, value)
+			if caching_tables ~= "Coins" then
+				rawset(self, key, value) -- might have to do key.Name instead, but everything might work like this too for platforms/buttons
+			else 
+			-- code for storing coins for each stage using Stage1/Stage2 as a key string for a table and then storing actual instances inside
+				if not self[key.Name] then
+					rawset(self, key.Name, {})
 				end
-
-				table.insert(cached_coins[part.Parent], part)
+				table.insert(self[key.Name], value)
 			end
+		end
+	})
+end
+
+for _, part in ipairs(game.Workspace.Obby:GetDescendants()) do -- looping through models in folder
+	-- cache buttons for each stage
+	if part.Name == button_name then
+		cached_buttons.Buttons[part.Parent] = part
+	-- cache platform finish points 
+	elseif part.name == platform_name then
+		cached_buttons.Platforms[part.Parent] = part
+	end
+
+	-- cache coins for stages
+	for i = 1, #coin_block_names do
+		if part.Name == coin_block_names[i] then
+			cached_buttons.Coins[part.Parent] = part
 		end
 	end
 end
 
 print("server caches")
-print(cached_coins)
 print(cached_buttons)
-print(cached_platforms)
 
-local button_touched = {}
+local button_touched = {} -- need to rename to touched_buttons and put all of the tables with touched buttons in it
 
 -- button touched
 for _, block in pairs(cached_buttons) do
@@ -107,6 +109,10 @@ for _, block in pairs(cached_buttons) do
 				-- gets the data and then gets the actual instances from the name by looping through shared game.Workspace.Obby
 				
 				buttonTouched:FireClient(player, button_touched) 
+				-- here it gets sent to client and client accesses data from it but client does not send it back later on
+				-- need to improve code on the client so he actually sends the table back, because if the client doesnt
+				-- then its not possible to touch the button ever again, 	
+				-- if not button_touched[player_userId][block.Parent.Name] then needs to be reset
 			end
 		end
 	end)
