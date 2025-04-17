@@ -76,6 +76,7 @@ buttonTouched.OnClientEvent:Connect(function(button_touched)
 	local platform = nil
 
 	-- this should become a function at one point
+	-- but im more aiming to reduce the 3 loops to only 1
 	for _, inner_table in pairs(button_touched) do
 		for stage_string, _ in pairs(inner_table) do
 			for _, stage_instance in ipairs(game.Workspace.Obby:GetChildren()) do
