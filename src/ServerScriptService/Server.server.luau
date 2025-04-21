@@ -39,12 +39,12 @@ local cached_buttons = {
 	Coins = {}
 }
 
-for caching_tables, table_value in pairs(cached_buttons) do
+for caching_tables, _ in pairs(cached_buttons) do
 	setmetatable(cached_buttons[caching_tables], {
 		__newindex = function(self, key, value)
 			if caching_tables ~= "Coins" then
 				rawset(self, key, value) -- might have to do key.Name instead, but everything might work like this too for platforms/buttons
-			else 
+			else
 			-- code for storing coins for each stage using Stage1/Stage2 as a key string for a table and then storing actual instances inside
 				if not self[key.Name] then
 					rawset(self, key.Name, {})
@@ -55,7 +55,7 @@ for caching_tables, table_value in pairs(cached_buttons) do
 	})
 end
 
-for _, part in ipairs(game.Workspace.Obby:GetDescendants()) do -- looping through models in folder
+for _, part in ipairs(game.Workspace.Obby:GetDescendants()) do -- looping through all the instances in folder and caching them
 	-- cache buttons for each stage
 	if part.Name == button_name then
 		cached_buttons.Buttons[part.Parent] = part
@@ -75,10 +75,8 @@ end
 print("server caches")
 print(cached_buttons)
 
-local button_touched = {} -- need to rename to touched_buttons and put all of the tables with touched buttons in it
-
 -- button touched
-for _, block in pairs(cached_buttons) do
+for _, block in pairs(cached_buttons) do -- need to fix since cached_button works completely different now
 	block.Touched:Connect(function(otherPart)
 
 		local humanoid = otherPart.Parent:FindFirstChild("Humanoid")  -- check if the part that touched the platform has a humanoid
@@ -118,8 +116,8 @@ for _, block in pairs(cached_buttons) do
 	end)
 end
 
--- Coin Collected/Touched
-for _, inner_table in pairs(cached_coins) do
+-- Coin Collected/Touched 
+for _, inner_table in pairs(cached_coins) do -- need to fix since cached_button works completely different now
 	for _, coins in ipairs(inner_table) do
 
 		coins.Touched:Connect(function(otherPart)
