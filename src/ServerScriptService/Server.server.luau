@@ -76,9 +76,9 @@ print("server caches")
 print(cached_buttons)
 
 -- button touched
-for _, block in pairs(cached_buttons.Buttons) do -- need to fix since cached_button works completely different now
-	block.Touched:Connect(function(otherPart)
+for Parent, block in pairs(cached_buttons.Buttons) do -- need to fix since cached_button works completely different now
 
+	block.Touched:Connect(function(otherPart)
 		local humanoid = otherPart.Parent:FindFirstChild("Humanoid")  -- check if the part that touched the platform has a humanoid
 		if humanoid then -- if it has a humanoid
 			local player = game.Players:GetPlayerFromCharacter(otherPart.Parent) -- get player from touching part
@@ -88,14 +88,8 @@ for _, block in pairs(cached_buttons.Buttons) do -- need to fix since cached_but
 				button_touched[player_userId] = {}
 			end
 
-			-- table that has all the strings for finding a shared instance in client/server
-			-- [[ ["491595967"] =  ▼  {
-				-- ["Stage1"] = true
-			 --]] } 
-			-- table example
-
-			if not button_touched[player_userId][block.Parent.Name] then
-				button_touched[player_userId][block.Parent.Name] = true
+			if not button_touched[player_userId][Parent.Name] then
+				button_touched[player_userId][Parent.Name] = true
 
 				print(button_touched, "button")
 
