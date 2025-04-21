@@ -76,7 +76,7 @@ print("server caches")
 print(cached_buttons)
 
 -- button touched
-for _, block in pairs(cached_buttons) do -- need to fix since cached_button works completely different now
+for _, block in pairs(cached_buttons.Buttons) do -- need to fix since cached_button works completely different now
 	block.Touched:Connect(function(otherPart)
 
 		local humanoid = otherPart.Parent:FindFirstChild("Humanoid")  -- check if the part that touched the platform has a humanoid
