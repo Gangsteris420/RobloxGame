@@ -3,6 +3,7 @@ local characterJoined = ReplicatedStorage:FindFirstChild("SendCache")
 local buttonTouched = ReplicatedStorage:FindFirstChild("ButtonTouched")
 local remoteFunction = ReplicatedStorage:FindFirstChild("RemoteFunction")
 local remoteEvent = ReplicatedStorage:FindFirstChild("RemoteEvent")
+local stageComplete = ReplicatedStorage:FindFirstChild("StageComplete")
 
 -- need to rework this part completely (how information is being passed to each client and server and from each other)
 -- then bugs can also be worked out because now how the information is being passed
@@ -26,8 +27,6 @@ local stages = {
 	},
 }
 
-local touched_coins = {}
-local cached_coins = {}
 
 -- example on how a certain instance can be found using a saved part String name from a dictionary that is sent from server to client.
 -- 1. a dictionary received from server is being looped over
@@ -52,7 +51,6 @@ local cached_coins = {}
 	end
 end)--]]
 
-local duplicated_stages = {}
 local can_be_touched = nil
 
 --[[characterJoined.OnClientEvent:Connect(function(coins)
@@ -72,38 +70,32 @@ end)--]]
 -- as well as sending the clonedBlock.Name and clonedBlock.Parent.Name and this way finding and instance
 -- or something similarly
 
-buttonTouched.OnClientEvent:Connect(function(button_touched)
-	local platform = nil
-
-	-- this should become a function at one point
-	-- but im more aiming to reduce the 3 loops to only 1
-	for _, inner_table in pairs(button_touched) do
-		for stage_string, _ in pairs(inner_table) do
-			for _, stage_instance in ipairs(game.Workspace.Obby:GetChildren()) do
-
-				if stage_instance.Name == stage_string then
-					platform = stage_instance:FindFirstChild("BigPlatformDoorOne")
-				end
-			end
-		end
+function CountTableLength(self) -- learning on how to use self bit by bit :/
+	local count = 0
+	for _, _ in pairs(self) do
+		count = count + 1
 	end
+	return count
+end
 
-	-- does work, logic was re-evaluated
-	-- continue working on from line 98
-
-	local player = game.Players.LocalPlayer
-	local humanoid = player.Character:WaitForChild("Humanoid")
+buttonTouched.OnClientEvent:Connect(function(ButtonsTouched)
+	local stage_str, platform_str = next(ButtonsTouched)
+	local stage = game.Workspace.Obby:FindFirstChild(stage_str)
+	local platform = stage:FindFirstChild(platform_str)
+	local button = stage:FindFirstChild("RedButtonOne")
+	local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
 	local stage_time = stages[platform.Parent.name]["Time"]
 
-	if can_be_touched == nil and player then
-		can_be_touched = true
-
-		-- InvokeServer() here
-		remoteFunction:InvokeServer(can_be_touched)
-		--remoteEvent:FireServer(can_be_touched)
+	if can_be_touched == nil then
+		can_be_touched = true -- for collecting coins/starting loop, maybe something else could be done
+		--
+		-- need to figure a good way of sending can_be_touched to server, or to figure out 
+		-- how to disable coin collecting in server before this exact loop works (maybe ask AI for any ideas)
+		--
 
 		platform.Transparency = 1
 		platform.CanCollide = false
+		button.CanTouch = false -- so in server side the player couldnt keep interacting with the button endlessly
 
 		for i = 1, stage_time, 1 do
 			task.wait(1)
@@ -112,12 +104,17 @@ buttonTouched.OnClientEvent:Connect(function(button_touched)
 			-- platform ending conditions
 			if i == stage_time or humanoid.Health == 0 then
 
-				can_be_touched = nil
+				stageComplete:FireServer(stage_str, platform_str)
+				-- could have potential weaknesses, not guaranteed full working
 
+				can_be_touched = nil
 				platform.Transparency = 0
 				platform.CanCollide = true
+				button.CanTouch = true
+				ButtonsTouched = {}
 
 				-- need to implement logic for reseting transparancy of collected coins 
+				-- but before need to implement coin collecting that only works when this loop works
 
 				break
 			end
