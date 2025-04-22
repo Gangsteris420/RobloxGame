@@ -3,17 +3,16 @@ local sendCache = ReplicatedStorage:FindFirstChild("SendCache")
 local buttonTouched = ReplicatedStorage:FindFirstChild("ButtonTouched")
 local remoteFunction = ReplicatedStorage:FindFirstChild("RemoteFunction")
 local remoteEvent = ReplicatedStorage:FindFirstChild("RemoteEvent")
+local stageComplete = ReplicatedStorage:FindFirstChild("StageComplete")
 
+local platform = "BigPlatform"
 local platform_name = "BigPlatformFinish"  -- could use a module script for this in the future
 local platform_door = "BigPlatformDoorOne"  -- could use a module script for this in the future
 local button_name = "RedButtonOne" -- could use a module script for this in the future
 local coin_block_names = { "CoinBlock1", "CoinBlock2"}  -- could use a module script for this in the future
+local player_button_Data = {}
 
 --local killPart = game.ReplicatedStorage.Obby:FindFirstChild("KillPart")
-
---local cached_coins = {}
---local cached_buttons = {}
---local cached_platforms = {}
 
 local stages = { -- could use a module script for this in the future
 	["Stage1"] = {
@@ -72,54 +71,60 @@ for _, part in ipairs(game.Workspace.Obby:GetDescendants()) do -- looping throug
 	end
 end
 
-print("server caches")
-print(cached_buttons)
+function insertToTable(uuid, parent)
+	if not player_button_Data[uuid].ButtonsTouched[parent.Name] then
+		player_button_Data[uuid].ButtonsTouched[parent.Name] = platform_door
+		return true
+	end
+	return false
+end
 
 -- button touched
-for Parent, block in pairs(cached_buttons.Buttons) do -- need to fix since cached_button works completely different now
-
+for parent, block in pairs(cached_buttons.Buttons) do -- need to fix since cached_button works completely different now
 	block.Touched:Connect(function(otherPart)
-		local humanoid = otherPart.Parent:FindFirstChild("Humanoid")  -- check if the part that touched the platform has a humanoid
-		if humanoid then -- if it has a humanoid
+		if otherPart.Parent:FindFirstChild("Humanoid") then -- if character interacted has a humanoid
 			local player = game.Players:GetPlayerFromCharacter(otherPart.Parent) -- get player from touching part
 			local player_userId = tostring(player.UserId)
+			local success = insertToTable(player_userId, parent)
 
-			if not button_touched[player_userId] then 
-				button_touched[player_userId] = {}
-			end
-
-			if not button_touched[player_userId][Parent.Name] then
-				button_touched[player_userId][Parent.Name] = true
-
-				print(button_touched, "button")
-
+			if success then
 				task.wait(0.1)
-
-				-- logic was re-evaluated in the server, button_touched only has strings, first table is with the 
-				-- sole string name of the player_userId, the inner table has stage to which the button pressed belongs
-				-- and the value of true. This table with inner table is sent to client, client loops through
-				-- gets the data and then gets the actual instances from the name by looping through shared game.Workspace.Obby
-				
-				buttonTouched:FireClient(player, button_touched) 
-				-- here it gets sent to client and client accesses data from it but client does not send it back later on
-				-- need to improve code on the client so he actually sends the table back, because if the client doesnt
-				-- then its not possible to touch the button ever again, 	
-				-- if not button_touched[player_userId][block.Parent.Name] then needs to be reset
+				buttonTouched:FireClient(player, player_button_Data[player_userId].ButtonsTouched)
 			end
 		end
 	end)
 end
 
--- Coin Collected/Touched 
-for _, inner_table in pairs(cached_coins) do -- need to fix since cached_button works completely different now
+-- Stage complete event triggered from client
+stageComplete.OnServerEvent:Connect(function(player, stage, platform)
+	local uuid = tostring(player.UserId)
+
+	-- making sure that the information was not exploited (by checking the original info and the info sent)
+	for stage_, platform_ in pairs(player_button_Data[uuid].ButtonsTouched) do
+		if stage_ == stage and platform_ == platform then
+			player_button_Data[uuid].ButtonsTouched = {}
+		else
+			print("stageComplete: invalid information, could be an exploiter!", player, stage, platform)
+		end
+	end
+end)
+
+-- Coin Collected/Touched (client | 92)
+for _, inner_table in pairs(cached_buttons.Coins) do -- need to fix since cached_button works completely different now
 	for _, coins in ipairs(inner_table) do
 
-		coins.Touched:Connect(function(otherPart)
-			local humanoid = otherPart.Parent:FindFirstChild("Humanoid")
-			local player = game.Players:GetPlayerFromCharacter(otherPart.Parent)
-			local can_be_touched = ServerInvoked()
 
-			print(can_be_touched, "coin collected")
+		-- I GUESS what kinf of logic i could use is when a coin is interacted either first check whether
+		-- player_button_Data[uuid].ButtonsTouched is not nil, which would indicate that only when it has something in it would work
+		-- and then validate whether coin that was interacted has the same stage and platform as the player_data[uuid].ButtonsTouched table
+		-- AND ofcourse i need to also check debounce, whether coin is collected so it wouldnt be possible to collect it non stop
+
+		--coins.Touched:Connect(function(otherPart)
+			--local humanoid = otherPart.Parent:FindFirstChild("Humanoid")
+			--local player = game.Players:GetPlayerFromCharacter(otherPart.Parent)
+			--local can_be_touched = ServerInvoked()
+
+			--print(can_be_touched, "coin collected")
 
 			--[[if player and humanoid and can_be_touched ~= nil then
 
@@ -129,18 +134,18 @@ for _, inner_table in pairs(cached_coins) do -- need to fix since cached_button 
 					blocks.Transparency = 1
 				end
 			end--]]
-		end)
+		--end)
 	end
 end
 
 -- might need this example in future for reference
-function ServerInvoked()
+--[[function ServerInvoked()
 	local boolean = nil
 	remoteFunction.OnServerInvoke = function(_, can_be_touched)
 		boolean = can_be_touched
 	end
 	return boolean
-end
+end--]]
 
 game.Players.PlayerAdded:Connect(function(player)
 	local PlayerStats = Instance.new("Folder")
@@ -161,6 +166,13 @@ game.Players.PlayerAdded:Connect(function(player)
 	stage.Name = "Stage_Health"
 	stage.Value = 0
 	stage.Parent = PlayerStats
+
+	-- ai suggested this idea, not a bad one
+	player_button_Data[tostring(player.UserId)] = {
+        ButtonsTouched = {},
+        CoinsTouched = {},
+        PlatformsTouched = {}
+    }
 
 	--[[player.CharacterAdded:Connect(function(character) 
 		--local rootPart = character:WaitForChild("HumanoidRootPart", 5)
