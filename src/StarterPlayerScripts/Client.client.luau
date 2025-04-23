@@ -79,6 +79,7 @@ function CountTableLength(self) -- learning on how to use self bit by bit :/
 end
 
 buttonTouched.OnClientEvent:Connect(function(ButtonsTouched)
+	-- need to add checks to make sure that ButtonsTouched was not altered with
 	local stage_str, platform_str = next(ButtonsTouched)
 	local stage = game.Workspace.Obby:FindFirstChild(stage_str)
 	local platform = stage:FindFirstChild(platform_str)
@@ -86,8 +87,10 @@ buttonTouched.OnClientEvent:Connect(function(ButtonsTouched)
 	local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
 	local stage_time = stages[platform.Parent.name]["Time"]
 
+	-- probably need to do client - server - client remote function
 	if can_be_touched == nil then
 		can_be_touched = true -- for collecting coins/starting loop, maybe something else could be done
+		
 		--
 		-- need to figure a good way of sending can_be_touched to server, or to figure out 
 		-- how to disable coin collecting in server before this exact loop works (maybe ask AI for any ideas)
@@ -97,12 +100,17 @@ buttonTouched.OnClientEvent:Connect(function(ButtonsTouched)
 		platform.CanCollide = false
 		button.CanTouch = false -- so in server side the player couldnt keep interacting with the button endlessly
 
+		-- this loop being in client side could be a potential issue
 		for i = 1, stage_time, 1 do
 			task.wait(1)
 			print(i)
 
 			-- platform ending conditions
 			if i == stage_time or humanoid.Health == 0 then
+
+			-- the fix for this code would probably be getting the time distance between the start time and the end time
+			-- basically the start time and the end time has to have passed the specified time in stages[platform.Parent.name]["Time"]
+			-- because a hacker cant fake a time passed
 
 				stageComplete:FireServer(stage_str, platform_str)
 				-- could have potential weaknesses, not guaranteed full working

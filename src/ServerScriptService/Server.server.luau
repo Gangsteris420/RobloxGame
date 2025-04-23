@@ -71,6 +71,14 @@ for _, part in ipairs(game.Workspace.Obby:GetDescendants()) do -- looping throug
 	end
 end
 
+function CountTableLength(self) -- learning on how to use self bit by bit :/
+	local count = 0
+	for _, _ in pairs(self) do
+		count = count + 1
+	end
+	return count
+end
+
 function insertToTable(uuid, parent)
 	if not player_button_Data[uuid].ButtonsTouched[parent.Name] then
 		player_button_Data[uuid].ButtonsTouched[parent.Name] = platform_door
@@ -98,13 +106,28 @@ end
 -- Stage complete event triggered from client
 stageComplete.OnServerEvent:Connect(function(player, stage, platform)
 	local uuid = tostring(player.UserId)
+	local table_length = CountTableLength(player_button_Data[uuid].ButtonsTouched)
 
-	-- making sure that the information was not exploited (by checking the original info and the info sent)
+	print("lol server called", stage, platform, player_button_Data[uuid].ButtonsTouched)
+	-- basically dont have an idea yet, can call this from client with the correct stage, platform strings
+	-- and it just resets the table to nil while the loop in client goes on
+
+	-- fix so it couldnt be exploited at all
+	if table_length == 0 then
+		print("stageComplete 3: invalid information, could be an exploiter!", player, stage, platform)
+	elseif stage == nil or platform == nil then
+		print("stageComplete 1: invalid information, could be an exploiter!", player, stage, platform)
+	elseif typeof(stage) ~= "string" or typeof(platform) ~= "string" then
+		print("stageComplete 2: invalid information, could be an exploiter!", player, stage, platform)
+	end
+
 	for stage_, platform_ in pairs(player_button_Data[uuid].ButtonsTouched) do
 		if stage_ == stage and platform_ == platform then
 			player_button_Data[uuid].ButtonsTouched = {}
+			print("lol loop exploited called", stage, platform, player_button_Data[uuid].ButtonsTouched)
 		else
-			print("stageComplete: invalid information, could be an exploiter!", player, stage, platform)
+			print("actual:", stage_, platform_)
+			print("stageComplete 4: invalid information, could be an exploiter!", player, stage, platform)
 		end
 	end
 end)
@@ -137,6 +160,8 @@ for _, inner_table in pairs(cached_buttons.Coins) do -- need to fix since cached
 		--end)
 	end
 end
+
+
 
 -- might need this example in future for reference
 --[[function ServerInvoked()
