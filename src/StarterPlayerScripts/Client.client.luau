@@ -86,7 +86,8 @@ buttonTouched.OnClientEvent:Connect(function(ButtonsTouched)
 	local button = stage:FindFirstChild("RedButtonOne")
 	local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
 	local stage_time = stages[platform.Parent.name]["Time"]
-
+	--local timeDiff
+	
 	-- probably need to do client - server - client remote function
 	if can_be_touched == nil then
 		can_be_touched = true -- for collecting coins/starting loop, maybe something else could be done
@@ -99,11 +100,16 @@ buttonTouched.OnClientEvent:Connect(function(ButtonsTouched)
 		platform.Transparency = 1
 		platform.CanCollide = false
 		button.CanTouch = false -- so in server side the player couldnt keep interacting with the button endlessly
+		--local startTime = os.clock()
 
 		-- this loop being in client side could be a potential issue
+		-- probably need the whole loop in the server side, just dont really see a non-exploitable way
 		for i = 1, stage_time, 1 do
 			task.wait(1)
 			print(i)
+
+			--local endTime = os.clock()
+			--timeDiff = endTime - startTime
 
 			-- platform ending conditions
 			if i == stage_time or humanoid.Health == 0 then
@@ -112,8 +118,17 @@ buttonTouched.OnClientEvent:Connect(function(ButtonsTouched)
 			-- basically the start time and the end time has to have passed the specified time in stages[platform.Parent.name]["Time"]
 			-- because a hacker cant fake a time passed
 
-				stageComplete:FireServer(stage_str, platform_str)
-				-- could have potential weaknesses, not guaranteed full working
+				stageComplete:FireServer()
+				-- could have potential weaknesses, not guaranteed full working WORKING ON it
+				
+				-- basically i need to try out this logic, i can try passing anything for now but once its received
+				-- i need to check whether the player triggering is the same player as it is in the player_button_Data[player_userId] table, with the same
+				-- player or player_uuid, then once that is validated to be the same player, i check whether the function was triggered before by the same player
+				-- if is triggered a second time, gg for the player
+
+				-- things to note: there should be a module that would keep track of times the stageComplete.OnServerEvent was triggered
+				-- also i need to figure out where i would like for the counter to be, probably here is fine but after fixing this i need to fix so the coins
+				-- could be collectible once the loop is running, so the loop itself might need to be in the server/module script
 
 				can_be_touched = nil
 				platform.Transparency = 0
