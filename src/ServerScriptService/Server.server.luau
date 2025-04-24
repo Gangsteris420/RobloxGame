@@ -71,7 +71,7 @@ for _, part in ipairs(game.Workspace.Obby:GetDescendants()) do -- looping throug
 	end
 end
 
-function CountTableLength(self) -- learning on how to use self bit by bit :/
+function CountTableLength(self) -- learning on how to use self bit by bit :/ and oop
 	local count = 0
 	for _, _ in pairs(self) do
 		count = count + 1
@@ -81,7 +81,7 @@ end
 
 function insertToTable(uuid, parent)
 	if not player_button_Data[uuid].ButtonsTouched[parent.Name] then
-		player_button_Data[uuid].ButtonsTouched[parent.Name] = platform_door
+		player_button_Data[uuid].ButtonsTouched[parent.Name] = platform_door -- might need to change this to a string from parameter if function will have other uses
 		return true
 	end
 	return false
@@ -103,33 +103,30 @@ for parent, block in pairs(cached_buttons.Buttons) do -- need to fix since cache
 	end)
 end
 
+function EventToString(eventName)
+	return tostring(eventName)
+end
+
+-- player_button_Data[uuid].ButtonsTouched = {}
 -- Stage complete event triggered from client
-stageComplete.OnServerEvent:Connect(function(player, stage, platform)
+stageComplete.OnServerEvent:Connect(function(player)
 	local uuid = tostring(player.UserId)
-	local table_length = CountTableLength(player_button_Data[uuid].ButtonsTouched)
+	local event = EventToString(stageComplete)
+	local tbl_length = CountTableLength(player_button_Data[uuid].ButtonsTouched)
+	local event_triggered = require(ReplicatedStorage.ModuleScript)
 
-	print("lol server called", stage, platform, player_button_Data[uuid].ButtonsTouched)
-	-- basically dont have an idea yet, can call this from client with the correct stage, platform strings
-	-- and it just resets the table to nil while the loop in client goes on
-
-	-- fix so it couldnt be exploited at all
-	if table_length == 0 then
-		print("stageComplete 3: invalid information, could be an exploiter!", player, stage, platform)
-	elseif stage == nil or platform == nil then
-		print("stageComplete 1: invalid information, could be an exploiter!", player, stage, platform)
-	elseif typeof(stage) ~= "string" or typeof(platform) ~= "string" then
-		print("stageComplete 2: invalid information, could be an exploiter!", player, stage, platform)
+	if tbl_length == 0 then
+		print("nanana", tbl_length, player_button_Data[uuid].ButtonsTouched)
+	else
+		print("yesyesyes", tbl_length, player_button_Data[uuid].ButtonsTouched)
 	end
 
-	for stage_, platform_ in pairs(player_button_Data[uuid].ButtonsTouched) do
-		if stage_ == stage and platform_ == platform then
-			player_button_Data[uuid].ButtonsTouched = {}
-			print("lol loop exploited called", stage, platform, player_button_Data[uuid].ButtonsTouched)
-		else
-			print("actual:", stage_, platform_)
-			print("stageComplete 4: invalid information, could be an exploiter!", player, stage, platform)
-		end
-	end
+	event_triggered.OnEvent(event, uuid)
+
+	-- the fix for this code would probably be getting the time distance between the start time and the end time from the client
+	-- basically the start time and the end time has to have passed the specified time in stages[platform.Parent.name]["Time"]
+	-- because a hacker cant fake a time passed
+
 end)
 
 -- Coin Collected/Touched (client | 92)
@@ -193,6 +190,11 @@ game.Players.PlayerAdded:Connect(function(player)
 	stage.Parent = PlayerStats
 
 	-- ai suggested this idea, not a bad one
+	-- but this probably might not be useful in the future because
+	-- it creates every time a player joins, so what happens if he leaves and joins?
+	-- does upon his leaving this wipe? also need to consider because for stages or (a stage player left standing on) a certain position must be saved
+	-- in order to teleport the player back for the stages he has achieved, sql database most likely required
+
 	player_button_Data[tostring(player.UserId)] = {
         ButtonsTouched = {},
         CoinsTouched = {},
