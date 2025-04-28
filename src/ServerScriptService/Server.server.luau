@@ -109,31 +109,49 @@ end
 
 -- player_button_Data[uuid].ButtonsTouched = {}
 -- Stage complete event triggered from client
+
+local StageData = {}
+
 stageStarted.OnServerEvent:Connect(function(player)
 	local uuid = tostring(player.UserId)
 	local tbl_length = CountTableLength(player_button_Data[uuid].ButtonsTouched)
+	local stage_str = next(player_button_Data[uuid].ButtonsTouched)
 
 	if tbl_length == 0 then
 		print("table is empty, exploiter at work!", tbl_length, player_button_Data[uuid].ButtonsTouched)
 		return
 	end
 
-	local event = EventToString(stageStarted)
-	local event_triggered = require(ServerScriptService.ModuleScript) 
+	local CountEvent = require(ServerScriptService.ModuleScript) 
+	local string_event = EventToString(stageStarted)
+	local NewCounter = CountEvent.new(StageData[uuid], string_event, uuid, stage_str) -- triggering the function to start the counter for the player
 
-	event_triggered.OnEvent(event, uuid) -- triggering the function to start the counter for the player
+
+	if NewCounter.EventName == "TriggeredCounter" then
+		local current_time = os.clock()
+		local timeDiff = current_time - NewCounter.Time
+
+		print(timeDiff, NewCounter.TimesTriggered)
+		if NewCounter.TimesTriggered >= 1 and timeDiff <= 3 then -- could change TimesTriggered to 1 or 2
+			print("cheater banned for spamming", NewCounter.TimesTriggered)
+			return
+		end
+		return
+	end
+
+	if not StageData[uuid] then
+		StageData[uuid] = {}
+	end
+
+	StageData[uuid] = NewCounter
+	NewCounter:Count()
+
+	player_button_Data[uuid].ButtonsTouched = {}
+	StageData[uuid][string_event] = {}
 
 	-- ❗ need to do more testing whether it works for each player individually or it starts buggin. ❗
 	-- i mean the function only works for each player when it is triggered from client
 	-- and it only resets the table based on the player.UserId so idk
-	
-	for i = 1, 5, 1 do
-		task.wait(1)
-		print("loop working", i, player)
-		if i == 5 then
-			player_button_Data[uuid].ButtonsTouched = {}
-		end
-	end
 
 	-- the fix for this code would probably be getting the time distance between the start time and the end time from the client
 	-- basically the start time and the end time has to have passed the specified time in stages[platform.Parent.name]["Time"]
