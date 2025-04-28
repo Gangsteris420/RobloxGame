@@ -1,9 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local sendCache = ReplicatedStorage:FindFirstChild("SendCache")
 local buttonTouched = ReplicatedStorage:FindFirstChild("ButtonTouched")
 local remoteFunction = ReplicatedStorage:FindFirstChild("RemoteFunction")
 local remoteEvent = ReplicatedStorage:FindFirstChild("RemoteEvent")
-local stageComplete = ReplicatedStorage:FindFirstChild("StageComplete")
+local stageStarted = ReplicatedStorage:FindFirstChild("StageStarted")
+local stageEnd = ReplicatedStorage:FindFirstChild("ResetStage")
 
 local platform = "BigPlatform"
 local platform_name = "BigPlatformFinish"  -- could use a module script for this in the future
@@ -13,20 +15,6 @@ local coin_block_names = { "CoinBlock1", "CoinBlock2"}  -- could use a module sc
 local player_button_Data = {}
 
 --local killPart = game.ReplicatedStorage.Obby:FindFirstChild("KillPart")
-
-local stages = { -- could use a module script for this in the future
-	["Stage1"] = {
-		["Points"] = 2,
-		["Time"] = 10, -- seconds
-		["Health"] = 3
-	},
-
-	["Stage2"] = {
-		["Points"] = 2,
-		["Time"] = 5,
-		["Health"] = 3
-	},
-}
 
 -- bug here occurs 0.000001% of times but probably it occurs because models dont get loaded.
 -- need to add that check so loop waited for the models to load, or maybe it doesnt detect the Obby folder itself WITH the models
@@ -79,9 +67,15 @@ function CountTableLength(self) -- learning on how to use self bit by bit :/ and
 	return count
 end
 
-function insertToTable(uuid, parent)
+function insertToTable(uuid, parent, part) -- third argument so the function could be used more than once
 	if not player_button_Data[uuid].ButtonsTouched[parent.Name] then
-		player_button_Data[uuid].ButtonsTouched[parent.Name] = platform_door -- might need to change this to a string from parameter if function will have other uses
+		--player_button_Data[uuid].ButtonsTouched[parent.Name] = platform_door
+	
+		player_button_Data[uuid].ButtonsTouched[parent.Name] = {
+			StagePart = part,
+			StageTime = require(ServerScriptService.StageData).ReturnData(parent.Name, "Time")
+		}
+
 		return true
 	end
 	return false
@@ -93,11 +87,17 @@ for parent, block in pairs(cached_buttons.Buttons) do -- need to fix since cache
 		if otherPart.Parent:FindFirstChild("Humanoid") then -- if character interacted has a humanoid
 			local player = game.Players:GetPlayerFromCharacter(otherPart.Parent) -- get player from touching part
 			local player_userId = tostring(player.UserId)
-			local success = insertToTable(player_userId, parent)
+			local success = insertToTable(player_userId, parent, platform_door)
 
 			if success then
 				task.wait(0.1)
-				buttonTouched:FireClient(player, player_button_Data[player_userId].ButtonsTouched)
+				buttonTouched:FireClient(player, player_button_Data[player_userId].ButtonsTouched, parent.Name)
+				-- also if the current way does not work i can attach a timer to the table when it was created
+				-- and later on this could be like a check if the stageStarted or stageComplete event was triggered after like lets say
+				-- more than 5 seconds it will detect it is a cheater
+				
+				-- ❗ also a tracker is important because the event could be spammed continuesly so checking whether it was triggered
+				-- more than 1 time in the time frame by a user is important too ❗
 			end
 		end
 	end)
@@ -109,19 +109,31 @@ end
 
 -- player_button_Data[uuid].ButtonsTouched = {}
 -- Stage complete event triggered from client
-stageComplete.OnServerEvent:Connect(function(player)
+stageStarted.OnServerEvent:Connect(function(player)
 	local uuid = tostring(player.UserId)
-	local event = EventToString(stageComplete)
 	local tbl_length = CountTableLength(player_button_Data[uuid].ButtonsTouched)
-	local event_triggered = require(ReplicatedStorage.ModuleScript)
 
 	if tbl_length == 0 then
-		print("nanana", tbl_length, player_button_Data[uuid].ButtonsTouched)
-	else
-		print("yesyesyes", tbl_length, player_button_Data[uuid].ButtonsTouched)
+		print("table is empty, exploiter at work!", tbl_length, player_button_Data[uuid].ButtonsTouched)
+		return
 	end
 
-	event_triggered.OnEvent(event, uuid)
+	local event = EventToString(stageStarted)
+	local event_triggered = require(ServerScriptService.ModuleScript) 
+
+	event_triggered.OnEvent(event, uuid) -- triggering the function to start the counter for the player
+
+	-- ❗ need to do more testing whether it works for each player individually or it starts buggin. ❗
+	-- i mean the function only works for each player when it is triggered from client
+	-- and it only resets the table based on the player.UserId so idk
+	
+	for i = 1, 5, 1 do
+		task.wait(1)
+		print("loop working", i, player)
+		if i == 5 then
+			player_button_Data[uuid].ButtonsTouched = {}
+		end
+	end
 
 	-- the fix for this code would probably be getting the time distance between the start time and the end time from the client
 	-- basically the start time and the end time has to have passed the specified time in stages[platform.Parent.name]["Time"]
