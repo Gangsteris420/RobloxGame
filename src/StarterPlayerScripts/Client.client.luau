@@ -92,7 +92,8 @@ buttonTouched.OnClientEvent:Connect(function(ButtonsTouched, stage_Name)
 		-- this loop being in client side could be a potential issue
 		-- probably need the whole loop in the server side, just dont really see a non-exploitable way
 		stageStarted:FireServer()
-		task.wait(stage_key_time)
+		task.wait(stage_key_time) -- need probably to make a remote function or rework because even if stageStarted failed due to cheating issue it still resets
+		-- or to trigger from server side when finished
 
 		platform.Transparency = 0
 		platform.CanCollide = true
